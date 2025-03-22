@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Track your reading list and rate your favorite books!">
-    <title>Book Reading Tracker</title>
+    <meta name="description" content="Track movies you've watched!">
+    <title>Movie Watch List Tracker</title>
     <style>
         body {
             font-family: system-ui, sans-serif;
@@ -12,12 +12,12 @@
             max-width: 800px;
             margin: 40px auto;
             padding: 20px;
-            background-color: #f5f5f5;
+            background-color: red;
         }
 
         .container {
             background-color: white;
-            padding: 30px;
+            padding: 5px;
             border-radius: 10px;
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
         }
@@ -53,11 +53,11 @@
             font-size: 16px;
         }
 
-        .books-list {
+        .movies-list {
             margin-top: 20px;
         }
 
-        .book-item {
+        .movie-item {
             display: flex;
             flex-wrap: wrap;
             align-items: center;
@@ -67,24 +67,24 @@
             border-radius: 5px;
         }
 
-        .book-item.completed {
+        .movie-item.completed {
             background-color: #f8fafc;
         }
 
-        .book-item.pending {
+        .movie-item.pending {
             background-color: white;
         }
 
-        .book-details h3 {
+        .movie-details h3 {
             margin: 0;
         }
 
-        .book-details h3.completed {
+        .movie-details h3.completed {
             text-decoration: line-through;
-            color: #718096;
+            color: red;
         }
 
-        .book-details p {
+        .movie-details p {
             margin: 5px 0;
             color: #718096;
         }
@@ -110,65 +110,67 @@
 </head>
 <body>
     <div class="container">
-        <h1>📚 My Reading List</h1>
+        <h1>🍿🎥📽️ My Movie Watch List 📽️🎥🍿</h1>
 
         <form action="{{ url_for('add') }}" method="post">
             <div style="flex: 2 1 200px;">
                 <input 
                     type="text" 
                     name="title" 
-                    placeholder="Book title..." 
+                    placeholder="Movie title..." 
                     required 
-                    aria-label="Book title">
+                    aria-label="Movie title">
             </div>
             <div style="flex: 1 1 150px;">
                 <input
                     type="text"
-                    name="author"
-                    placeholder="Author..."
+                    name="year_aired"
+                    placeholder="Enter year movie aired..."
                     required
-                    aria-label="Author">
+                    aria-label="Year Aired">
             </div>
-            <div style="flex: 0 1 100px;">
+            <div style="flex: 1 1 150px;">
                 <input
                     type="number"
-                    name="pages"
-                    placeholder="Pages..."
-                    aria-label="Number of pages">
+                    name="rating"
+                    placeholder="Enter rating (1-5)"
+                    required
+                    aria-label="Movie Rating"
+                    min="1"
+                    max="5">
             </div>
-            <button type="submit">Add Book</button>
+            <button type="submit">Add Movie</button>
         </form>
 
-        <div class="books-list">
-            {% for book in books %}
-            <div class="book-item {% if book.completed %}completed{% else %}pending{% endif %}">
-                <div class="book-details" style="flex: 1 1 200px;">
-                    <h3 class="{% if book.completed %}completed{% endif %}">
-                        {{ book.title }}
+        <div class="movies-list">
+            {% for movie in movies %}
+            <div class="movie-item {% if movie.watched %}completed{% else %}pending{% endif %}">
+                <div class="movie-details" style="flex: 1 1 200px;">
+                    <h3 class="{% if movie.watched %}completed{% endif %}">
+                        {{ movie.title }}
                     </h3>
                     <p>
-                        by {{ book.author }}
-                        {% if book.pages %} • {{ book.pages }} pages{% endif %}
+                        Aired: {{ movie.year_aired }}
                     </p>
                 </div>
 
                 <div style="display: flex; align-items: center; gap: 10px;">
                     <div class="rating">
                         {% for i in range_values %}
-                        <a href="{{ url_for('rate', book_id=book.id, rating=i) }}" 
-                           aria-label="Rate {{ book.title }} {{ i }} stars">
-                            {% if book.rating >= i %}⭐{% else %}☆{% endif %}
+                        <a href="{{ url_for('rate', movie_id=movie.id, rating=i) }}" 
+                           aria-label="Rate {{ movie.title }} {{ i }} stars">
+                            {% if movie.rating and movie.rating >= i %}⭐{% else %}☆{% endif %}
                         </a>
                         {% endfor %}
                     </div>
 
-                    <a href="{{ url_for('toggle', book_id=book.id) }}" 
-                       aria-label="Toggle completion of {{ book.title }}">
-                        {% if book.completed %}🔄{% else %}✅{% endif %}
+                    <a href="{{ url_for('toggle', movie_id=movie.id) }}" 
+                       aria-label="Toggle completion of {{ movie.title }}">
+                        {% if movie.watched %}❌{% else %}👁️{% endif %}
                     </a>
 
-                    <a href="{{ url_for('delete', book_id=book.id) }}" 
-                       aria-label="Delete {{ book.title }}">
+                    <a href="{{ url_for('delete', movie_id=movie.id) }}" 
+                       aria-label="Delete {{ movie.title }}">
                         🗑️
                     </a>
                 </div>
