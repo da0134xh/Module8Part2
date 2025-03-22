@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Track your reading list and rate your favorite books!">
+    <title>Book Reading Tracker</title>
+    <style>
+        body {
+            font-family: system-ui, sans-serif;
+            line-height: 1.6;
+            max-width: 800px;
+            margin: 40px auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+
+        .container {
+            background-color: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            color: #2d3748;
+            margin-bottom: 24px;
+            text-align: center;
+        }
+
+        form {
+            margin-bottom: 20px;
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        input[type="text"], input[type="number"] {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #e2e8f0;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+
+        button {
+            background-color: #4299e1;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        .books-list {
+            margin-top: 20px;
+        }
+
+        .book-item {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            padding: 15px;
+            margin-bottom: 10px;
+            border: 1px solid #e2e8f0;
+            border-radius: 5px;
+        }
+
+        .book-item.completed {
+            background-color: #f8fafc;
+        }
+
+        .book-item.pending {
+            background-color: white;
+        }
+
+        .book-details h3 {
+            margin: 0;
+        }
+
+        .book-details h3.completed {
+            text-decoration: line-through;
+            color: #718096;
+        }
+
+        .book-details p {
+            margin: 5px 0;
+            color: #718096;
+        }
+
+        .rating {
+            display: flex;
+            gap: 2px;
+        }
+
+        .rating a {
+            text-decoration: none;
+            font-size: 20px;
+        }
+
+        a {
+            text-decoration: none;
+        }
+
+        a[aria-label="Delete"] {
+            color: #e53e3e;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📚 My Reading List</h1>
+
+        <form action="{{ url_for('add') }}" method="post">
+            <div style="flex: 2 1 200px;">
+                <input 
+                    type="text" 
+                    name="title" 
+                    placeholder="Book title..." 
+                    required 
+                    aria-label="Book title">
+            </div>
+            <div style="flex: 1 1 150px;">
+                <input
+                    type="text"
+                    name="author"
+                    placeholder="Author..."
+                    required
+                    aria-label="Author">
+            </div>
+            <div style="flex: 0 1 100px;">
+                <input
+                    type="number"
+                    name="pages"
+                    placeholder="Pages..."
+                    aria-label="Number of pages">
+            </div>
+            <button type="submit">Add Book</button>
+        </form>
+
+        <div class="books-list">
+            {% for book in books %}
+            <div class="book-item {% if book.completed %}completed{% else %}pending{% endif %}">
+                <div class="book-details" style="flex: 1 1 200px;">
+                    <h3 class="{% if book.completed %}completed{% endif %}">
+                        {{ book.title }}
+                    </h3>
+                    <p>
+                        by {{ book.author }}
+                        {% if book.pages %} • {{ book.pages }} pages{% endif %}
+                    </p>
+                </div>
+
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    <div class="rating">
+                        {% for i in range_values %}
+                        <a href="{{ url_for('rate', book_id=book.id, rating=i) }}" 
+                           aria-label="Rate {{ book.title }} {{ i }} stars">
+                            {% if book.rating >= i %}⭐{% else %}☆{% endif %}
+                        </a>
+                        {% endfor %}
+                    </div>
+
+                    <a href="{{ url_for('toggle', book_id=book.id) }}" 
+                       aria-label="Toggle completion of {{ book.title }}">
+                        {% if book.completed %}🔄{% else %}✅{% endif %}
+                    </a>
+
+                    <a href="{{ url_for('delete', book_id=book.id) }}" 
+                       aria-label="Delete {{ book.title }}">
+                        🗑️
+                    </a>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</body>
+</html>
